@@ -7,9 +7,11 @@ const _ = require('lodash'),
     program = new Command(),
     version = require('../package.json').version,
     newman = require('../'),
+    login = require('../lib/login'),
     util = require('./util'),
 
-    RUN_COMMAND = 'run';
+    RUN_COMMAND = 'run',
+    DEFAULT_USER = 'default';
 
 program
     .name('newman')
@@ -88,6 +90,24 @@ program
                 err.friendly && console.error(`  ${err.friendly}\n`);
             }
             runError && !_.get(options, 'suppressExitCode') && process.exit(1);
+        });
+    });
+
+program
+    .command('login [user]')
+    .description('Name of the user for local reference. If not specified, uses default profile.')
+    .usage('[user] [options]')
+    .option('-p, --passkey', 'Provide the passkey to securely store the API Key')
+    .action((user, command) => {
+        let options = util.commanderToObject(command);
+
+        options.user = user || DEFAULT_USER;
+        login(options, (err) => {
+            if (err) {
+                console.error(`error: ${err.message || err}\n`);
+                err.help && console.error(err.help);
+                process.exit(1);
+            }
         });
     });
 
