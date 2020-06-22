@@ -8,7 +8,11 @@ const _ = require('lodash'),
     program = new Command(),
     version = require('../package.json').version,
     newman = require('../'),
-    util = require('./util');
+    util = require('./util'),
+
+    logout = require('../lib/logout'),
+
+    RUN_COMMAND = 'run';
 
 program
     .name('newman')
@@ -87,6 +91,19 @@ program
                 err.friendly && console.error(`  ${err.friendly}\n`);
             }
             runError && !_.get(options, 'suppressExitCode') && process.exit(1);
+        });
+    });
+
+program.command('logout [alias]')
+    .description('Alias of the API Key. If not specified, assumes `default`.')
+    .usage('[alias]')
+    .action((alias) => {
+        logout(alias, (err) => {
+            if (err) {
+                console.error(`error: ${err.message || err}\n`);
+                err.help && console.error(err.help);
+                process.exit(1);
+            }
         });
     });
 
