@@ -299,4 +299,39 @@ describe('cli parser', function () {
                 });
         });
     });
+
+    describe('Logout Command', function () {
+        let spy;
+
+        before(function () {
+            // create a new spy
+            spy = sinon.spy();
+
+            // replace the function to be exported from the login module with the spy
+            require.cache[require.resolve('../../lib/logout')] = {
+                exports: spy
+            };
+        });
+
+        after(function () {
+            // restore original `logout` module.
+            delete require.cache[require.resolve('../../lib/logout')];
+        });
+
+        it('should work with an alias', function (done) {
+            cli('node newman.js logout testalias'.split(' '), 'logout', function (err) {
+                expect(err).to.be.null;
+                expect(spy.withArgs('testalias').calledOnce).to.be.true;
+                done();
+            });
+        });
+
+        it('should work without an alias', function (done) {
+            cli('node newman.js logout'.split(' '), 'logout', function (err) {
+                expect(err).to.be.null;
+                expect(spy.withArgs(undefined).calledOnce).to.be.true;
+                done();
+            });
+        });
+    });
 });
