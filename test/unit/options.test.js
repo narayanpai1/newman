@@ -8,7 +8,7 @@ describe('options', function () {
 
             options({
                 collection: './test/fixtures/run/spaces/single-get-request.json'
-            }, function (err, result) {
+            }, {}, function (err, result) {
                 expect(err).to.be.null;
 
                 // remove undefined properties
@@ -26,7 +26,7 @@ describe('options', function () {
 
             options({
                 environment: './test/fixtures/run/spaces/simple-variables.json'
-            }, function (err, result) {
+            }, {}, function (err, result) {
                 expect(err).to.be.null;
 
                 expect(_.omit(result.environment.toJSON(), 'id')).to.eql(environment);
@@ -39,7 +39,7 @@ describe('options', function () {
 
             options({
                 globals: './test/fixtures/run/spaces/simple-variables.json'
-            }, function (err, result) {
+            }, {}, function (err, result) {
                 expect(err).to.be.null;
 
                 expect(_.omit(result.globals.toJSON(), 'id')).to.eql(globals);
@@ -52,7 +52,7 @@ describe('options', function () {
 
             options({
                 iterationData: './test/fixtures/run/spaces/data.json'
-            }, function (err, result) {
+            }, {}, function (err, result) {
                 expect(err).to.be.null;
                 expect(result.iterationData).to.eql(data);
                 done();
@@ -63,7 +63,7 @@ describe('options', function () {
     it('should have newmanVersion property by default', function (done) {
         var newmanVersion = require('../../package.json').version;
 
-        options({}, function (err, result) {
+        options({}, {}, function (err, result) {
             expect(err).to.be.null;
             expect(result).to.have.property('newmanVersion', newmanVersion);
             done();
@@ -71,7 +71,7 @@ describe('options', function () {
     });
 
     it('should set current directory as workingDir if not given', function (done) {
-        options({}, function (err, result) {
+        options({}, {}, function (err, result) {
             expect(err).to.be.null;
             expect(result).to.have.property('workingDir', process.cwd());
             done();
@@ -79,7 +79,7 @@ describe('options', function () {
     });
 
     it('should set insecureFileRead to true if not given', function (done) {
-        options({}, function (err, result) {
+        options({}, {}, function (err, result) {
             expect(err).to.be.null;
             expect(result).to.have.property('insecureFileRead', true);
             done();
