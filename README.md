@@ -34,16 +34,21 @@ Newman is a command-line collection runner for Postman. It allows you to effortl
     1. [Using External Reporters](#using-external-reporters)
     2. [Creating Your Own Reporter](#creating-your-own-reporter)
 7. [File Uploads](#file-uploads)
-8. [Configuration Setters](#configuration-setters-for-the-commands)
+8. [Using Newman with the Postman API](#using-newman-with-the-postman-api)
+    1. [postman-api-key option](#postman-api-key)
+    2. [postmans-api-key-alias option](#postman-api-key-alias)
+        1. [Login Command](#login)
+        2. [Logout Command](#logout)
+9. [Configuration Setters](#configuration-setters-for-the-commands)
     1. [Config Files](#config-files)
     2. [Environment Variables](#environment-variables)
-9. [Using Newman in Docker](#using-newman-in-docker)
-10. [Using Socks Proxy](#using-socks-proxy)
-11. [Migration Guide](#migration-guide)
-12. [Compatibility](#compatibility)
-13. [Contributing](#contributing)
-14. [Community Support](#community-support)
-15. [License](#license)
+10. [Using Newman in Docker](#using-newman-in-docker)
+11. [Using Socks Proxy](#using-socks-proxy)
+12. [Migration Guide](#migration-guide)
+13. [Compatibility](#compatibility)
+14. [Contributing](#contributing)
+15. [Community Support](#community-support)
+16. [License](#license)
 
 
 ## Getting started
@@ -157,6 +162,15 @@ For more details on [Reporters](#reporters) and writing your own [External Repor
 
 - `--no-insecure-file-read`<br />
   Prevents reading of files situated outside of the working directory.
+
+- `--postman-api-key <value>`<br />
+  Specify the Postman-API-Key to be used for accessing resources in Postman-Cloud.
+
+- `--postman-api-key-alias <value>`<br />
+  Specify the alias of the Postman-API-Key to be used for accessing resources in Postman-Cloud.
+
+- `--sync-environment`<br />
+  Update the corresponding environment in Postman-Cloud (if there is one) with the resultant environment.
 
 - `--export-environment <path>`<br />
   The path to the file where Newman will output the final environment variables file before completing a run.
@@ -274,6 +288,8 @@ return of the `newman.run` function is a run instance, which emits run events th
 | options.collection        | The collection is a required property of the `options` argument. It accepts an object representation of a Postman Collection which should resemble the schema mentioned at [https://schema.getpostman.com/](https://schema.getpostman.com/). The value of this property could also be an instance of Collection Object from the [Postman Collection SDK](https://github.com/postmanlabs/postman-collection).<br /><br />As `string`, one can provide a URL where the Collection JSON can be found (e.g. [Postman Cloud API](https://api.getpostman.com/) service) or path to a local JSON file.<br /><br />_Required_<br />Type: `object\|string` [PostmanCollection](https://github.com/postmanlabs/postman-collection/wiki#Collection) |
 | options.environment       | One can optionally pass an environment file path or URL as `string` to this property and that will be used to read Postman Environment Variables from. This property also accepts environment variables as an `object`. Environment files exported from Postman App can be directly used here.<br /><br />_Optional_<br />Type: `object\|string` |
 | options.globals           | Postman Global Variables can be optionally passed on to a collection run in form of path to a file or URL. It also accepts variables as an `object`.<br /><br />_Optional_<br />Type: `object\|string` |
+| options.postmanApiKey           | Specify the Postman-API-Key to be used for accessing resources in Postman-Cloud.<br /><br />_Optional_<br />Type: `string` |
+| options.syncEnvironment           | Update the corresponding environment in Postman-Cloud (if there is one) with the resultant environment.<br /><br />_Optional_<br />Type: `boolean`, Default value: `false`|
 | options.iterationCount    | Specify the number of iterations to run on the collection. This is usually accompanied by providing a data file reference as `options.iterationData`.<br /><br />_Optional_<br />Type: `number`, Default value: `1` |
 | options.iterationData     | Path to the JSON or CSV file or URL to be used as data source when running multiple iterations on a collection.<br /><br />_Optional_<br />Type: `string` |
 | options.folder            | The name or ID of the folder/folders (ItemGroup) in the collection which would be run instead of the entire collection.<br /><br />_Optional_<br />Type: `string\|array` |
@@ -590,15 +606,41 @@ $ newman run file-upload.postman_collection.json
 
 ## Using Newman with the Postman API
 
-1 [Generate an API key](https://app.getpostman.com/dashboard/integrations)<br/>
-2 Fetch a list of your collections from: `https://api.getpostman.com/collections?apikey=$apiKey`<br/>
-3 Get the collection link via it's `uid`: `https://api.getpostman.com/collections/$uid?apikey=$apiKey`<br/>
-4 Obtain the environment URI from: `https://api.getpostman.com/environments?apikey=$apiKey`<br/>
-5 Using the collection and environment URIs acquired in steps 3 and 4, run the collection as follows:
-```console
-$ newman run "https://api.getpostman.com/collections/$uid?apikey=$apiKey" \
-    --environment "https://api.getpostman.com/environments/$uid?apikey=$apiKey"
+Newman supports the access of Postman-Cloud resources by its ID/UID/URL. This is done using the Postman API Key. Click [here](https://app.getpostman.com/dashboard/integrations) to generate the key.
+
+This key can be used with the help of the following options.
+
+### `postman-api-key`
+This option allows us to directly specify the Postman API Key to be used during the run as follows.
+
+``` console
+$ newman run $postman_collection_id -e $postman_environment_id --postman-api-key=PMAK-123456e12345678-edb123456789e12345
 ```
+
+### `postman-api-key-alias`
+To avoid repeatitive use of these keys, Newman allows us to store frequently used API Keys with an alias.
+
+Following are the commands provided for adding and deleting an alias.
+- ### `login`
+    This is an interactive command to add an API-Key-Alias. The access to the API Key can also be protected with a passkey.
+
+    ``` console
+    $ newman login
+    ```
+
+- ### `logout`
+    This is an interactive command to delete an existing API-Key-Alias.
+
+    ``` console
+    $ newman logout
+    ```
+
+An alias, once set, can be used in the run command to access Postman resources using the `postman-api-key-alias` option as follows.
+
+``` console
+$ newman run $postman_collection_id --postman-api-key-alias=$alias
+```
+To find out more about this option and its best use, click [here](#).
 
 [back to top](#table-of-contents)
 
