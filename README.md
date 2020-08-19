@@ -34,7 +34,9 @@ Newman is a command-line collection runner for Postman. It allows you to effortl
     1. [Using External Reporters](#using-external-reporters)
     2. [Creating Your Own Reporter](#creating-your-own-reporter)
 7. [File Uploads](#file-uploads)
-8. [Using Newman with the Postman API](#using-newman-with-the-postman-api)
+8. [Configuration Setters](#configuration-setters-for-the-commands)
+    1. [Config Files](#config-files)
+    2. [Environment Variables](#environment-variables)
 9. [Using Newman in Docker](#using-newman-in-docker)
 10. [Using Socks Proxy](#using-socks-proxy)
 11. [Migration Guide](#migration-guide)
@@ -597,6 +599,47 @@ $ newman run file-upload.postman_collection.json
 $ newman run "https://api.getpostman.com/collections/$uid?apikey=$apiKey" \
     --environment "https://api.getpostman.com/environments/$uid?apikey=$apiKey"
 ```
+
+[back to top](#table-of-contents)
+
+## Configuration setters for the commands
+To avoid repeated use of options for a command, Newman provides us with configuration setters like config-file and environment-variables. These setters allow us to set default values for different options. In case of a clash, the environment variable will be given a higher preference.
+
+### Config files
+Config files allow the user to set default options using a JSON object as shown below.
+
+``` json
+{
+    "run": {
+        "bail": true,
+        "reporters": ["json"],
+        "iterationCount": 3,
+        "color": "off"
+    }
+}
+```
+Following is the list of files which Newman looks for (in increasing priority), before the run.
+
+1. `~/.postman/newmanrc` (in *nix-based systems) or `C:\Users\$user\.postman\newmanrc` (in Windows systems)
+2. `.newmanrc` file in the current working directory.
+
+### Environment variables
+The default value of the following options for the current shell session can be set using the corresponding environment variables.
+1. `postman-api-key`: `POSTMAN_API_KEY`
+2. `postman-api-key-alias`: `POSTMAN_API_KEY_ALIAS`
+
+For example, the default value of `postman-api-key-alias` can be set as follows.
+- In *nix-based systems
+    ``` console
+    $ export POSTMAN_API_KEY_ALIAS=$alias
+    ```
+
+- In Windows systems
+    ``` console
+    $ set POSTMAN_API_KEY_ALIAS=$alias
+    ```
+
+**Note**: Environment variables are a property of a single shell program. Hence, its value is retained only for the current shell session.
 
 [back to top](#table-of-contents)
 
